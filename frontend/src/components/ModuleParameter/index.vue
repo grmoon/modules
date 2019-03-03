@@ -1,6 +1,12 @@
 <template>
-    <input type='number' v-if='isFloatType' />
-    <input type='text' v-else />
+  <input
+    v-if="isFloatType"
+    type="number"
+  >
+  <input
+    v-else
+    type="text"
+  >
 </template>
 
 <script>

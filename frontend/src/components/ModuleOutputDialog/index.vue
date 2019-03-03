@@ -1,11 +1,18 @@
 <template>
   <Dialog>
-    <div v-for='(output, name) in module.outputs' :key='name'>
+    <div
+      v-for="(output, name) in module.outputs"
+      :key="name"
+    >
       <label>
         <div>
           {{ name }}
         </div>
-        <input type='number' :value='output.value' disabled />
+        <input
+          type="number"
+          :value="output.value"
+          disabled
+        >
       </label>
     </div>
   </Dialog>
@@ -16,6 +23,11 @@ import Dialog from '@components/Dialog';
 
 export default {
   components: { Dialog },
-  props: ['module']
+  props: {
+    module: {
+      required: true,
+      type: Object
+    }
+  }
 }
 </script>

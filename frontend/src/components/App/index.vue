@@ -1,24 +1,24 @@
 <template>
-  <div class='container'>
+  <div class="container">
     <ModuleCreationForm />
-    <div class='modules'>
+    <div class="modules">
       <Module
-        @show_module_inputs='module_onShowModuleInputs'
-        @show_module_outputs='module_onShowModuleOutputs'
-        v-for='(module, moduleId) in modules'
-        :key='moduleId'
-        :module='module'
+        v-for="(module, moduleId) in modules"
+        :key="moduleId"
+        :module="module"
+        @show_module_inputs="module_onShowModuleInputs"
+        @show_module_outputs="module_onShowModuleOutputs"
       />
     </div>
     <ModuleInputDialog
-      v-if='showInputDialog'
-      :module='focusedModule'
-      @cancel='inputDialog_onCancel'
+      v-if="showInputDialog"
+      :module="focusedModule"
+      @cancel="inputDialog_onCancel"
     />
     <ModuleOutputDialog
-      v-if='showOutputDialog'
-      :module='focusedModule'
-      @cancel='outputDialog_onCancel'
+      v-if="showOutputDialog"
+      :module="focusedModule"
+      @cancel="outputDialog_onCancel"
     />
   </div>
 </template>
@@ -61,6 +61,9 @@ export default {
       }
     }
   },
+  created() {
+    this.$store.dispatch('initialize');
+  },
   methods: {
     inputDialog_onCancel() {
       this.showInputDialog = false;
@@ -76,9 +79,6 @@ export default {
       this.focusedModule = module;
       this.showOutputDialog = true;
     }
-  },
-  created() {
-    this.$store.dispatch('initialize');
   }
 }
 </script>

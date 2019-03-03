@@ -1,11 +1,21 @@
 <template>
-  <div :class='classes'>
-    <div @click.prevent='inputToggle_onClick' class='module-toggle module-toggle--input'>
-      <div class='module-toggle-text--input'>In</div>
+  <div :class="classes">
+    <div
+      class="module-toggle module-toggle--input"
+      @click.prevent="inputToggle_onClick"
+    >
+      <div class="module-toggle-text--input">
+        In
+      </div>
     </div>
     {{ module.name }}
-    <div @click.prevent='outputToggle_onClick' class='module-toggle module-toggle--output'>
-      <div class='module-toggle-text--output'>Out</div>
+    <div
+      class="module-toggle module-toggle--output"
+      @click.prevent="outputToggle_onClick"
+    >
+      <div class="module-toggle-text--output">
+        Out
+      </div>
     </div>
   </div>
 </template>
@@ -77,28 +87,9 @@ export default {
       y: 0
     }
   },
-  methods: {
-    inputToggle_onClick() {
-      this.$emit('show_module_inputs', this.module);
-    },
-    outputToggle_onClick() {
-      this.$emit('show_module_outputs', this.module);
-    },
-    module_onMove(event) {
-      this.x += event.dx;
-      this.y += event.dy;
-
-      const transform = `translate(${this.x}px, ${this.y}px)`;
-
-      event.target.style.webkitTransform = transform;
-      event.target.style.transform = transform;
-    }
-  },
   computed: {
     classes() {
       return ['module', `module--${this.module.state}`];
-
-      return classes;
     }
   },
   mounted() {
@@ -118,6 +109,23 @@ export default {
           endOnly: true
         }
       });
+  },
+  methods: {
+    inputToggle_onClick() {
+      this.$emit('show_module_inputs', this.module);
+    },
+    outputToggle_onClick() {
+      this.$emit('show_module_outputs', this.module);
+    },
+    module_onMove(event) {
+      this.x += event.dx;
+      this.y += event.dy;
+
+      const transform = `translate(${this.x}px, ${this.y}px)`;
+
+      event.target.style.webkitTransform = transform;
+      event.target.style.transform = transform;
+    }
   }
 }
 </script>

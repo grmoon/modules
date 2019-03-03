@@ -9,19 +9,24 @@ module.exports = {
   entry: path.resolve('src', 'js', 'index.js'),
   output: {
     path: path.resolve('dist'),
-    filename: '[hash].js'
+    filename: '[name].[hash].js'
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         exclude: /node_modules/,
-        use: ['vue-loader']
+        use: ['vue-loader', 'eslint-loader']
       },
       {
-        test: /\.css$/,
+        test: /\.js$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: ['babel-loader', 'eslint-loader']
+      },
+      {
+        test: /\.s?css$/,
+        exclude: /node_modules/,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
       }
     ]
   },

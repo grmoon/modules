@@ -1,8 +1,13 @@
 <template>
-  <div class='dialog-container'>
-    <div class='dialog'>
+  <div class="dialog-container">
+    <div class="dialog">
       <slot />
-      <div class='dialog--close-btn' @click='close_onClick'>&times;</div>
+      <div
+        class="dialog--close-btn"
+        @click="close_onClick"
+      >
+        &times;
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +49,7 @@ export default {
     this.$store.commit('setShowingDialogBox', true);
   },
   methods: {
-    close_onClick(event) {
+    close_onClick() {
       this.$store.commit('setShowingDialogBox', false);
     }
   }

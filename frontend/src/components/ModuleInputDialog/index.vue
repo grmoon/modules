@@ -1,60 +1,69 @@
 <template>
   <Dialog>
-    <form @submit.prevent='form_onSubmit'>
-      <div v-for='(input, name) in module.inputs' :key='name'>
+    <form @submit.prevent="form_onSubmit">
+      <div
+        v-for="(input, name) in module.inputs"
+        :key="name"
+      >
         <label>
           <div>{{ name }}</div>
-          <ModuleParameter :parameter='input' />
+          <ModuleParameter :parameter="input" />
           <input
-            class='module-input'
             v-if="shouldShowManualInput(input.type, name)"
-            type='number'
-            :name='name'
+            class="module-input"
+            type="number"
+            :name="name"
             required
-          />
-          <select
-            :name='name'
-            class='module-input'
-            v-else
           >
-            <option disabled selected>Select a Module Output</option>
+          <select
+            v-else
+            :name="name"
+            class="module-input"
+          >
+            <option
+              disabled
+              selected
+            >Select a Module Output</option>
             <optgroup
-              v-for='(outputs, outputModuleName) in modulesByOutputType[input.type]'
-              :key='outputModuleName'
-              :label='outputModuleName'
+              v-for="(outputs, outputModuleName) in modulesByOutputType[input.type]"
+              :key="outputModuleName"
+              :label="outputModuleName"
             >
               <option
-                v-for='(output, index) in outputs'
-                :key='index'
-                :data-module-id='output.moduleId'
-                :value='`${output.moduleId}_${output.name}`'
+                v-for="(output, index) in outputs"
+                :key="index"
+                :data-module-id="output.moduleId"
+                :value="`${output.moduleId}_${output.name}`"
               >
-              {{ outputModuleName }}: {{ output.name }}
+                {{ outputModuleName }}: {{ output.name }}
               </option>
             </optgroup>
           </select>
         </label>
-        <label v-if='shouldShowManualInputOption(input.type)'>
+        <label v-if="shouldShowManualInputOption(input.type)">
           Manual Input: <input
-            @change='radio_onChange'
-            type='radio'
-            :name='`input_method-${name}`'
-            value='manual'
-            :data-name='name'
+            type="radio"
+            :name="`input_method-${name}`"
+            value="manual"
+            :data-name="name"
             checked
-          />
+            @change="radio_onChange"
+          >
         </label>
-        <label v-if='shouldShowInputFromModuleOption(input.type)'>
+        <label v-if="shouldShowInputFromModuleOption(input.type)">
           Input From Module: <input
-            @change='radio_onChange'
-            type='radio'
-            :name='`input_method-${name}`'
-            value='from_module'
-            :data-name='name'
-          />
+            type="radio"
+            :name="`input_method-${name}`"
+            value="from_module"
+            :data-name="name"
+            @change="radio_onChange"
+          >
         </label>
       </div>
-      <input type='submit' value='Save Inputs' />
+      <input
+        type="submit"
+        value="Save Inputs"
+      >
     </form>
   </Dialog>
 </template>
@@ -66,15 +75,17 @@ import { mapState } from 'vuex';
 
 export default {
   components: { Dialog, ModuleParameter },
-  props: ['module'],
-  computed: {
-    ...mapState(['modules']),
+  props: {
+    module: {
+      required: true,
+      type: Object
+    }
   },
   data() {
     const inputMethods = {};
     const modulesByOutputType = {};
 
-    Object.entries(this.module.inputs).forEach(([name, input]) => {
+    Object.keys(this.module.inputs).forEach(name => {
       inputMethods[name] = 'manual';
     });
 
@@ -82,6 +93,9 @@ export default {
       inputMethods,
       modulesByOutputType
     }
+  },
+  computed: {
+    ...mapState(['modules']),
   },
   created() {
     const modulesByOutputType = {};
