@@ -1,0 +1,2 @@
+biz-log==5.2.0
+websockets==7.0
