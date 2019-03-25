@@ -7,14 +7,18 @@
       >
         <label>
           <div>{{ name }}</div>
-          <ModuleParameter :parameter="input" />
-          <input
+          <ModuleParameter
+            v-if="shouldShowManualInput(input.type, name)"
+            :parameter="input"
+            class="module-input"
+          />
+          <!-- <input
             v-if="shouldShowManualInput(input.type, name)"
             class="module-input"
             type="number"
             :name="name"
             required
-          >
+          > -->
           <select
             v-else
             :name="name"

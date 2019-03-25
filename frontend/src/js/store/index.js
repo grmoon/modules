@@ -24,6 +24,9 @@ const store = new Vuex.Store({
     setModuleState(state, { moduleId, moduleState }) {
       Vue.set(state.modules[moduleId], 'state', moduleState);
     },
+    setModuleError(state, { moduleId, error }) {
+      Vue.set(state.modules[moduleId], 'error', error);
+    },
     setModuleOutputs(state, moduleOutputs) {
         Object.entries(moduleOutputs).forEach(([moduleId, outputs]) => {
           const _module = state.modules[moduleId];
@@ -31,8 +34,6 @@ const store = new Vuex.Store({
           Object.entries(outputs).forEach(([name, value]) => {
             Vue.set(_module.outputs[name], 'value', value);
           });
-
-          console.log(outputs);
         });
     },
     createModule(state, moduleParams) {
@@ -77,11 +78,11 @@ socket.onopen = () => {
 }
 
 socket.onclose = (event) => {
-  debugger;
+  console.log(event);
 }
 
 socket.onerror = (event) => {
-  debugger;
+  console.log(event);
 }
 
 socket.onmessage = (event) => {
@@ -91,15 +92,35 @@ socket.onmessage = (event) => {
   const content = message.content;
 
   switch (command) {
-    case 'get_available_modules':
+    case 'get_available_modules': {
+        content.sort((module1, module2) => {
+          return module1.type.localeCompare(module2.type);
+        });
+
         store.commit('setModuleClasses', content);
         break;
+      }
       case 'module_calculation_started': {
         const moduleId = content['module_id'];
 
         store.commit('setModuleState', {
           moduleId,
           moduleState: ModuleState.calculating
+        });
+        break;
+      }
+      case 'module_calculation_error': {
+        const moduleId = content['module_id'];
+        const error = content['error'];
+
+        store.commit('setModuleState', {
+          moduleId,
+          moduleState: ModuleState.error,
+        });
+
+        store.commit('setModuleError', {
+          error,
+          moduleId,
         });
         break;
       }

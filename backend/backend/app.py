@@ -9,6 +9,8 @@ from enum import Enum, auto
 from available_modules import AVAILABLE_MODULES, MODULES_BY_TYPE
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
+
 connections = {}
 
 class Command(Enum):
@@ -25,6 +27,11 @@ def serialize_module(module):
         'outputs': {key: value.__name__ for key, value in outputs.items()},
     }
 
+async def send(websocket, message):
+    logger.info('Sending message to {}: {}'.format(websocket.remote_address, message))
+
+    await websocket.send(json.dumps(message))
+
 async def get_available_modules(websocket):
     content = [serialize_module(module) for module in AVAILABLE_MODULES]
 
@@ -33,8 +40,7 @@ async def get_available_modules(websocket):
         'content': content
     }
 
-    await websocket.send(json.dumps(response))
-
+    await send(websocket, response)
 
 async def build_inputs(module_inputs, outputs):
     inputs = {}
@@ -73,46 +79,51 @@ async def calculate(websocket, modules):
             inputs, can_calculate = await build_inputs(module['inputs'], outputs)
 
             if can_calculate:
-                calculation_occurred = True
-
-                await websocket.send(json.dumps({
+                await send(websocket, {
                     'command': 'module_calculation_started',
                     'content': {
                         'module_id': module_id
                     }
-                }))
+                })
 
                 try:
                     outputs[module_id] = module_class.run(inputs)
                 except Exception as exc:
-                    await websocket.send(json.dumps({
+                    await send(websocket, {
                         'command': 'module_calculation_error',
                         'content': {
-                            'module_id': module_id
+                            'error': str(exc),
+                            'module_id': module_id,
                         }
-                    }))
+                    })
                 else:
-                    await websocket.send(json.dumps({
+                    calculation_occurred = True
+
+                    await send(websocket, {
                         'command': 'module_calculation_finished',
                         'content': {
                             'module_id': module_id
                         }
-                    }))
+                    })
             else:
                 next_modules[module_id] = module
 
-    await websocket.send(json.dumps({
+    await send(websocket, {
         'command': 'calculations',
         'content': {
             'completed': all_calculated,
             'outputs': outputs,
         }
-    }))
+    })
 
 async def consumer(websocket):
+    logger.info('Connecting to {}.'.format(websocket.remote_address))
+
     while True:
         try:
             message = json.loads(await websocket.recv())
+            logger.info('Received message from {}: {}'.format(websocket.remote_address, message))
+
             command = message['command']
 
             if command == Command.GET_AVAILABLE_MODULES.value:
@@ -120,7 +131,10 @@ async def consumer(websocket):
             elif command == Command.CALCULATE.value:
                 await calculate(websocket, message['modules'])
         except websockets.ConnectionClosed:
+            logger.info('Disconnecting from {}.'.format(websocket.remote_address))
+
             del connections[websocket.remote_address]
+            break
 
 
 async def server(websocket, path):

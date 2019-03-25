@@ -1,5 +1,8 @@
 <template>
-  <div :class="classes">
+  <div
+    :class="classes"
+    :title="module.error"
+  >
     <div
       class="module-toggle module-toggle--input"
       @click.prevent="inputToggle_onClick"
@@ -36,6 +39,10 @@
 
 .module--calculating {
   background-color: darkkhaki;
+}
+
+.module--error {
+  background-color: darksalmon;
 }
 
 .module--complete {
